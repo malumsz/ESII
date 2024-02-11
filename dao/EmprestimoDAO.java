@@ -1,6 +1,5 @@
 package dao;
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,29 +8,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bd.ConexaoBD;
-import classes.Aluno;
-import classes.Emprestimo;
+import classes.*;
 
 public class EmprestimoDAO {
 
-    public void registrarEmprestimo(Emprestimo emprestimo) {
-        String sql = "INSERT INTO Emprestimo (RA_aluno, codigo_livro, data_emprestimo, data_prevista_devolucao) VALUES (?, ?, ?, ?)";
+    public boolean registrarEmprestimo(Emprestimo emprestimo, String ra) {
+        String sql = "INSERT INTO Emprestimo (ra_aluno, codigo_livro, data_emprestimo, data_prevista_devolucao) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = ConexaoBD.obterConexao();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, emprestimo.getRAAluno());
+            stmt.setString(1, ra);
             stmt.setInt(2, emprestimo.getCodigoLivro());
             stmt.setDate(3, new java.sql.Date(emprestimo.getDataEmprestimo().getTime()));
             stmt.setDate(4, new java.sql.Date(emprestimo.getDataPrevistaDevolucao().getTime()));
             stmt.executeUpdate();
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
     public List<Emprestimo> buscarEmprestimosPorRA(String RA) {
         List<Emprestimo> emprestimos = new ArrayList<>();
-        String sql = "SELECT * FROM Emprestimo WHERE RA_aluno = ?";
+        String sql = "SELECT * FROM Emprestimo WHERE ra_aluno = ?";
 
         try (Connection conn = ConexaoBD.obterConexao();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -40,10 +40,18 @@ public class EmprestimoDAO {
                 while (rs.next()) {
                     Emprestimo emprestimo = new Emprestimo();
                     emprestimo.setId(rs.getInt("id"));
-                    emprestimo.setRAAluno(rs.getString("RA_aluno"));
-                    emprestimo.setCodigoLivro(rs.getInt("codigo_livro"));
                     emprestimo.setDataEmprestimo(rs.getDate("data_emprestimo"));
                     emprestimo.setDataPrevistaDevolucao(rs.getDate("data_prevista_devolucao"));
+
+                    // Carregar aluno associado ao empréstimo
+                    Aluno aluno = new AlunoDAO().buscarAlunoPorRA(RA);
+                    emprestimo.setAluno(aluno);
+
+                    // Carregar livro associado ao empréstimo
+                    int codigoLivro = rs.getInt("codigo_livro");
+                    Livro livro = new LivroDAO().buscarLivroPorCodigo(codigoLivro);
+                    emprestimo.setLivro(livro);
+
                     emprestimos.add(emprestimo);
                 }
             }

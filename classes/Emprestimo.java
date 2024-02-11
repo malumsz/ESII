@@ -5,118 +5,98 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import dao.EmprestimoDAO;
+import dao.*;
 
 public class Emprestimo {
+    private Date dataEmprestimo = new Date();
+    private Date dataPrevista = new Date();
+    private List<Item> itens = new ArrayList<>();
+    private Aluno aluno;
+    private Livro livro;
+	private int id;
 
-	Date dataEmprestimo = new Date();
-	Date dataPrevista = new Date();
-	Date data_aux = new Date();
-	String nome;
-	int id;
-	//Cada emprestimo tem um conjutno de itens
-    List<Item> item = new ArrayList<Item>();
-    int emprestimo=0;
-	Aluno aluno;
-	Livro livro;
+    public Date getDataEmprestimo() {
+        return dataEmprestimo;
+    }
 
-	public String getRAAluno() {
-		return aluno.RA;
-	}
+    public void setDataEmprestimo(Date dataEmprestimo) {
+        this.dataEmprestimo = dataEmprestimo;
+    }
 
-	public int getCodigoLivro(){
-		return livro.codigo;
-	}
+    public Date getDataPrevistaDevolucao() {
+        return dataPrevista;
+    }
 
-	public Date getDataPrevistaDevolucao(){
-		return dataPrevista;
-	}
+    public void setDataPrevistaDevolucao(Date dataPrevista) {
+        this.dataPrevista = dataPrevista;
+    }
 
-	public Date getDataEmprestimo() {
-		return dataEmprestimo;
-	}
+    public String getRAAluno() {
+        return aluno.getRA();
+    }
+
+    public int getCodigoLivro() {
+        return livro.getCodigo();
+    }
 
 	public void setId(int id) {
-		this.id = id;
-	}
+        this.id = id;
+    }
 
-	public void setRAAluno(String ra) {
-		this.aluno.RA = ra;
-	}
+	public void setAluno(Aluno aluno) {
+        this.aluno = aluno;
+    }
 
-	public void setCodigoLivro(int codigo) {
-		this.livro.codigo = codigo;
-	}
+    public void setLivro(Livro livro) {
+        this.livro = livro;
+    }
 
-	public void setDataEmprestimo(Date dataEmprestimo) {
-		this.dataEmprestimo = dataEmprestimo;
-	}
+    public boolean criarEmprestimo(String ra) {
+        EmprestimoDAO emprestimoDAO = new EmprestimoDAO();
+        return emprestimoDAO.registrarEmprestimo(this, ra);
+    }
 
-	public void setDataPrevistaDevolucao(Date dataPrevista) {
-		this.dataPrevista = dataPrevista;
-	}
-
-	public boolean criarEmprestimo(String ra) {
-    	EmprestimoDAO emprestimoDAO = new EmprestimoDAO();
-    	return emprestimoDAO.criarEmprestimo(ra);
-	}
-
-	for (Livro livro : livros) {
-		if (!livro.verificaLivro()) {
-			// Livro não pode ser emprestado
-			// Implemente a lógica para informar ao usuário que o livro não pode ser emprestado
-		} else if (livro.verificaReserva()) {
-			// Livro está reservado
-			// Implemente a lógica para informar ao usuário que o livro está reservado e mostrar a data de devolução
-		} else {
-			// Livro pode ser emprestado
-			// Crie um item de empréstimo associado ao livro
-			ItemEmprestimo item = new ItemEmprestimo(livro.getId());
-			// Adicione o item de empréstimo ao empréstimo
-			emprestimo.adicionarItem(item);
-		}
-	}
-
-	// Metodo respons vel por realizar o empr stimo
-    public boolean emprestar(List<Livro> livros, String RA) {
-		//TODO Auto-generated method stub
-    	int aux;
-    	//Para o numero de livros a ser emprestado
-    	for(int i=0; i<livros.size();i++)
-		//Adiciona um novo item no cojunto de items, e passa o livro a ser associado a ele
-    		item.add(new Item(livros.get(i))); 
-         
-          //Chama o metodo para calcular a data de devolu  o caso tenha pelo menos um livro que possa ser emprestado
-    		CalculaDataDevolucao();
-    		System.out.print("\nNumero de livros emprestados: "+this.emprestimo);
-    	    System.out.print("\nData de emprestimo: "+this.dataEmprestimo);
-    	    System.out.print("\nData de devolucao: "+this.dataPrevista);
-    		this.aluno.RA = RA;
-			return true;
-    	
-	}
+    public boolean emprestar(List<Livro> livros, String ra) {
+        AlunoDAO alunoDAO = new AlunoDAO();
+        this.dataEmprestimo = new Date();
+        this.aluno = alunoDAO.buscarAlunoPorRA(ra); // Obtém o aluno do banco de dados usando AlunoDAO
+        this.itens.clear();
     
-	private Date CalculaDataDevolucao()
-	{   
-		Date date = new Date();
-		
-		for(int j=0;j<item.size();j++)
-		{   data_aux = item.get(j).calculaDataDevolucao(date);
-		    if( dataPrevista.compareTo(data_aux) < 0)
-			  dataPrevista = data_aux;
-		}
-		if(item.size()>2)
-		{
-			int tam = item.size()-2;
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(dataPrevista);
-			calendar.add(Calendar.DATE, (tam*2));
-	        dataPrevista = calendar.getTime();
-		}
-		for(int j=0;j<item.size();j++)
-			item.get(j).setDataDevolucao(dataPrevista);
-		
-		return dataPrevista;
-	
-	}
+        LivroDAO livroDAO = new LivroDAO(); // Instanciando LivroDAO
+    
+        for (Livro livro : livros) {
+            if (!livro.verificaLivro()) {
+                // Livro não pode ser emprestado
+                System.out.println("O livro " + livro.getTitulo() + " não pode ser emprestado.");
+            } else if (livroDAO.verificaDisponibilidade(livro.getCodigo())) {
+                // Livro está reservado
+                Date dataDevolucao = livroDAO.getDataDevolucao(livro.getCodigo());
+                System.out.println("O livro " + livro.getTitulo() + " está reservado até " + dataDevolucao);
+            } else {
+                // Livro pode ser emprestado
+                // Crie um item de empréstimo associado ao livro
+                Item item = new Item(livro);
+                item.setLivro(livro);
+                // Adicione o item de empréstimo ao empréstimo
+                this.itens.add(item);
+            }
+        }
+    
+        // Calcula a data de devolução
+        calcularDataDevolucao();
+    
+        EmprestimoDAO emprestimoDAO = new EmprestimoDAO();
+        // Realiza o empréstimo no banco de dados
+        return emprestimoDAO.registrarEmprestimo(this, ra);
+    }
+    
+
+    private void calcularDataDevolucao() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(this.dataPrevista);
+
+        // Adiciona 14 dias à data atual
+        calendar.add(Calendar.DAY_OF_YEAR, 14);
+        this.dataPrevista = calendar.getTime();
+    }
 }

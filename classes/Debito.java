@@ -1,5 +1,7 @@
 package classes;
 
+import dao.*;
+
 public class Debito {
 	int codigoAluno;
 
@@ -7,14 +9,8 @@ public class Debito {
 		this.codigoAluno = aluno;
 	}
 	
-	public boolean verificaDebito()
-	{
-	//codigo aleatorio para definir se o aluno tem d bito
-	//  necess rio fazer a verifica  o de forma persistente
-	if(this.codigoAluno == 4)
-		 return false;
-	 else
-		return true;
+	public boolean verificaDebito(String ra){
+		return AlunoDAO.verificarDebitosAluno(ra);
 	}
 
 }

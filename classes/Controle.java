@@ -18,7 +18,7 @@ public class Controle {
        }
 	  
 	  //Verifica se o aluno possui algum Debito
-	  if (!a.verificaDebito())
+	  if (!a.verificarDebitosAluno(RA))
 	  {
 		  System.out.println("Aluno em Debito");
 		  retorno = false;

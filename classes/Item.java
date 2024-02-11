@@ -12,7 +12,6 @@ public class Item {
 	public Item(Livro livro) {
 		super();
 		this.livro = livro;
-		
 	}
 
 	public Date getDataDevolucao() {

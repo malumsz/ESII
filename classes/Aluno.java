@@ -7,6 +7,7 @@ import dao.AlunoDAO;
 public class Aluno {
 String RA;
 String nome;
+boolean debito;
 
 	public Aluno(String RA, String nome) {
 		super();
@@ -31,21 +32,16 @@ String nome;
 		this.RA = RA;
 	}
 
+	public void setDebito(boolean debito) {
+        this.debito = debito;
+    }
+
 	public boolean verificarAlunoCadastrado(String ra) {
-    AlunoDAO alunoDAO = new AlunoDAO();
-    return alunoDAO.verificarAlunoCadastrado(ra);
+		return AlunoDAO.verificarAlunoCadastrado(ra);
 	}
 
 	public boolean verificarDebitosAluno(String ra) {
-		AlunoDAO alunoDAO = new AlunoDAO();
-		return alunoDAO.verificarDebitosAluno(ra);
-	}
-
-	public boolean verificaDebito(){       
-		//instancia um objeto d bito
-		Debito debito = new Debito(Integer.parseInt(this.RA)); 
-		/* Aqui voc  deve chamar o metodo verificaDebito da classe debito*/
-		return debito.verificaDebito();
+		return AlunoDAO.verificarDebitosAluno(ra);
 	}
 
 	//Metodo que delega a funcionalidade de emprestar para a classe emprestimo
