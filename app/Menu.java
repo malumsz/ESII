@@ -17,6 +17,7 @@ public class Menu extends Application {
         // Criar botões para as opções
         Button btnCadastrarLivro = new Button("Cadastrar Livro");
         Button btnCadastrarAluno = new Button("Cadastrar Aluno");
+        Button btnEmprestimo = new Button("Emprestar Livro");
         Button btnSair = new Button("Sair");
 
         // Adicionar ação aos botões
@@ -30,12 +31,17 @@ public class Menu extends Application {
             cadastroAluno.start(new Stage());
         });
 
+        btnEmprestimo.setOnAction(e -> {
+            EmprestimoLivro EmprestimoLivro = new EmprestimoLivro();
+            EmprestimoLivro.start(new Stage());
+        });
+
         btnSair.setOnAction(e -> primaryStage.close());
 
         // Layout do menu
         VBox vbox = new VBox(10);
         vbox.setAlignment(Pos.CENTER);
-        vbox.getChildren().addAll(new Label("Selecione uma opção:"), btnCadastrarLivro, btnCadastrarAluno, btnSair);
+        vbox.getChildren().addAll(new Label("Selecione uma opção:"), btnCadastrarLivro, btnCadastrarAluno, btnEmprestimo, btnSair);
 
         Scene scene = new Scene(vbox, 300, 200);
         primaryStage.setScene(scene);

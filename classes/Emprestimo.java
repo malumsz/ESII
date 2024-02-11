@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import dao.EmprestimoDAO;
+
 public class Emprestimo {
 
 	Date dataEmprestimo = new Date();
@@ -52,6 +54,27 @@ public class Emprestimo {
 
 	public void setDataPrevistaDevolucao(Date dataPrevista) {
 		this.dataPrevista = dataPrevista;
+	}
+
+	public boolean criarEmprestimo(String ra) {
+    	EmprestimoDAO emprestimoDAO = new EmprestimoDAO();
+    	return emprestimoDAO.criarEmprestimo(ra);
+	}
+
+	for (Livro livro : livros) {
+		if (!livro.verificaLivro()) {
+			// Livro não pode ser emprestado
+			// Implemente a lógica para informar ao usuário que o livro não pode ser emprestado
+		} else if (livro.verificaReserva()) {
+			// Livro está reservado
+			// Implemente a lógica para informar ao usuário que o livro está reservado e mostrar a data de devolução
+		} else {
+			// Livro pode ser emprestado
+			// Crie um item de empréstimo associado ao livro
+			ItemEmprestimo item = new ItemEmprestimo(livro.getId());
+			// Adicione o item de empréstimo ao empréstimo
+			emprestimo.adicionarItem(item);
+		}
 	}
 
 	// Metodo respons vel por realizar o empr stimo

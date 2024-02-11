@@ -2,6 +2,8 @@ package classes;
 
 import java.util.List;
 
+import dao.AlunoDAO;
+
 public class Aluno {
 String RA;
 String nome;
@@ -29,12 +31,14 @@ String nome;
 		this.RA = RA;
 	}
 
-	public boolean verficaAluno(){   
-		//Se o RA   null   retorna erro - m todo aleat rio
-		if(this.RA.equals("10"))
-		return false;
-	else
-		return true;
+	public boolean verificarAlunoCadastrado(String ra) {
+    AlunoDAO alunoDAO = new AlunoDAO();
+    return alunoDAO.verificarAlunoCadastrado(ra);
+	}
+
+	public boolean verificarDebitosAluno(String ra) {
+		AlunoDAO alunoDAO = new AlunoDAO();
+		return alunoDAO.verificarDebitosAluno(ra);
 	}
 
 	public boolean verificaDebito(){       
