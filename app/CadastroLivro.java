@@ -71,7 +71,7 @@ public class CadastroLivro extends Application {
         String sql = "INSERT INTO livros (titulo, prazo_emprestimo) VALUES (?, ?)";
     
         try (Connection conn = ConexaoBD.obterConexao();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, titulo);
             stmt.setInt(2, prazo);
             stmt.executeUpdate();

@@ -11,7 +11,7 @@ public class Controle {
 	  /*Aqui voc  deve instaciar um objeto aluno*/
 	  Aluno a = new Aluno(RA, aluno);
 	  //Verifica se o aluno existe
-	  if (!a.verficaAluno())
+	  if (!a.verificarAlunoCadastrado(RA))
 	  {
 		  System.out.println("Aluno Inexistente");
 		  retorno = false;
@@ -51,5 +51,5 @@ public class Controle {
 	  else
 		  return retorno;
   }
-	
+
 }
