@@ -5,7 +5,9 @@ import java.util.Scanner;
 public class Main {
 
 	public static void main(String[] args) {
-		 
+
+		//funcionalidades completas em 'app > Menu.java'
+		
 		 Scanner entrada = new Scanner (System.in);
 		 int[] codigos= {0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 		 System.out.print("Digite o RA do aluno: ");

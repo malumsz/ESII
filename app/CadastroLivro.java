@@ -3,6 +3,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -12,6 +13,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.sql.Date;
 
 import bd.ConexaoBD;
 import classes.Titulo;
@@ -34,18 +37,21 @@ public class CadastroLivro extends Application {
         gridPane.add(txtTitulo, 1, 0);
 
         Label lblPrazo = new Label("Prazo de Empréstimo:");
-        TextField txtPrazo = new TextField();
+        DatePicker datePicker = new DatePicker();
+        
         gridPane.add(lblPrazo, 0, 1);
-        gridPane.add(txtPrazo, 1, 1);
+        gridPane.add(datePicker, 1, 1);
 
         Button btnCadastrar = new Button("Cadastrar");
         Button btnVoltarInicio = new Button("Voltar ao Início");
 
         btnCadastrar.setOnAction(e -> {
             String titulo = txtTitulo.getText();
-            int prazo = Integer.parseInt(txtPrazo.getText());
+            LocalDate selectedDate = datePicker.getValue();
+            Date date = java.sql.Date.valueOf(selectedDate);
+
             //Titulo t = new Titulo(prazo, titulo);
-            boolean cadastrou = cadastrarLivro(titulo, prazo);
+            boolean cadastrou = cadastrarLivro(titulo, date);
             if (cadastrou) {
                 exibirAlerta(Alert.AlertType.INFORMATION, "Sucesso", "Livro cadastrado com sucesso!");
             } else {
@@ -59,7 +65,7 @@ public class CadastroLivro extends Application {
         vbox.setAlignment(Pos.CENTER);
         vbox.getChildren().addAll(gridPane, btnCadastrar, btnVoltarInicio);
 
-        Scene scene = new Scene(vbox, 300, 200);
+        Scene scene = new Scene(vbox, 350, 200);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -67,13 +73,13 @@ public class CadastroLivro extends Application {
         launch(args);
     }
 
-    private static boolean cadastrarLivro(String titulo, int prazo) {
+    private static boolean cadastrarLivro(String titulo, Date date) {
         String sql = "INSERT INTO livros (titulo, prazo_emprestimo) VALUES (?, ?)";
     
         try (Connection conn = ConexaoBD.obterConexao();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, titulo);
-            stmt.setInt(2, prazo);
+            stmt.setDate(2, date);
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
