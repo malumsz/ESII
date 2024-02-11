@@ -12,7 +12,7 @@ import classes.*;
 public class LivroDAO {
 
     public static void marcarLivroComoDisponivel(int codigoLivro) throws SQLException {
-        String sql = "UPDATE livros SET disponivel = true WHERE id = ?";
+        String sql = "UPDATE livros SET disponivel = true AND prazo_emprestimo = NULL WHERE id = ?";
         try (Connection connection = ConexaoBD.obterConexao();
             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, codigoLivro);

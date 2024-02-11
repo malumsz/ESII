@@ -23,6 +23,19 @@ public class AlunoDAO {
         }
     }
 
+    public static void criarDebito(String raAluno) {
+        String sql = "UPDATE alunos SET debito = ? WHERE ra = ?";
+
+        try (Connection conn = ConexaoBD.obterConexao();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setBoolean(1, true);
+            stmt.setString(2, raAluno);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static boolean verificarAlunoCadastrado(String raAluno) {
         String query = "SELECT COUNT(*) FROM alunos WHERE ra = ?";
         try (Connection connection = ConexaoBD.obterConexao();

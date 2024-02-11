@@ -9,10 +9,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 import bd.ConexaoBD;
 
@@ -30,16 +32,28 @@ public class EmprestimoLivro extends Application {
         gridPane.add(lblRA, 0, 0);
         gridPane.add(txtRA, 1, 0);
 
-        Label lblCodigos = new Label("Códigos dos Livros:");
+        Label lblCodigos = new Label("Código do Livro:"); 
         TextField txtCodigos = new TextField();
         gridPane.add(lblCodigos, 0, 1);
         gridPane.add(txtCodigos, 1, 1);
 
+        Label lblPrazo = new Label("Data de Devolução:");
+        DatePicker datePicker = new DatePicker();
+
+        gridPane.add(lblPrazo, 0, 2);
+        gridPane.add(datePicker, 1, 2);
+
         Button btnEmprestar = new Button("Emprestar");
         Button btnVoltarInicio = new Button("Voltar ao Início");
 
-        btnEmprestar.setOnAction(e -> emprestarLivros(txtRA.getText(), txtCodigos.getText()));
-        
+        btnEmprestar.setOnAction(e -> {
+            LocalDate selectedDate = datePicker.getValue();
+            Date date = java.sql.Date.valueOf(selectedDate);
+
+            emprestarLivros(txtRA.getText(), txtCodigos.getText(), date);
+        });
+
+
         btnVoltarInicio.setOnAction(e ->  primaryStage.close());
 
         VBox vbox = new VBox(10);
@@ -53,7 +67,7 @@ public class EmprestimoLivro extends Application {
 
     }
 
-    private void emprestarLivros(String ra, String codigos) {
+    private void emprestarLivros(String ra, String codigos, Date date) {
         boolean alunoCadastrado = verificarAlunoCadastrado(ra);
         boolean debitosAluno = verificarDebitosAluno(ra);
         boolean emprestimoEfetuado = false;
@@ -61,13 +75,21 @@ public class EmprestimoLivro extends Application {
         if (alunoCadastrado && !debitosAluno) {
             String[] codigosLivros = codigos.split(",");
             for (String codigo : codigosLivros) {
-                boolean livroEmprestado = emprestarLivro(Integer.parseInt(codigo), ra);
+                boolean livroEmprestado = emprestarLivro(Integer.parseInt(codigo), ra, date);
                 if (!livroEmprestado) {
                     exibirMensagem("Livro com código " + codigo + " não pode ser emprestado.");
                     return;
                 }
             }
             emprestimoEfetuado = true;
+        }
+
+        if (!alunoCadastrado) {
+            exibirMensagem("Aluno não cadastrado!");
+        }
+
+        if (debitosAluno) {
+            exibirMensagem("Aluno com débito!");
         }
 
         if (emprestimoEfetuado) {
@@ -110,7 +132,7 @@ public class EmprestimoLivro extends Application {
         return false;
     }
 
-    public static boolean emprestarLivro(int codigoLivro, String ra) {
+    public static boolean emprestarLivro(int codigoLivro, String ra, Date date) {
         String sql = "SELECT disponivel FROM livros WHERE id = ?";
         try (Connection conn = ConexaoBD.obterConexao();
             PreparedStatement stmt = conn.prepareStatement(sql)) {    // Verificar a disponibilidade do livro
@@ -129,10 +151,11 @@ public class EmprestimoLivro extends Application {
             }
 
             // Gravar empréstimo no banco de dados
-            String inserirEmprestimoQuery = "INSERT INTO emprestimo (codigo_livro, ra_aluno) VALUES (?, ?)";
+            String inserirEmprestimoQuery = "INSERT INTO emprestimo (codigo_livro, ra_aluno, data_prevista_devolucao) VALUES (?, ?, ?)";
             PreparedStatement inserirEmprestimoStatement = conn.prepareStatement(inserirEmprestimoQuery);
             inserirEmprestimoStatement.setInt(1, codigoLivro);
             inserirEmprestimoStatement.setString(2, ra);
+            inserirEmprestimoStatement.setDate(3, date);
             inserirEmprestimoStatement.executeUpdate();
 
             // Atualizar status do livro para indisponível
