@@ -17,8 +17,8 @@ import java.time.LocalDate;
 import java.sql.Date;
 
 import bd.ConexaoBD;
-import classes.Titulo;
-import classes.Livro;
+import classes.*;
+import dao.*;
 
 public class CadastroLivro extends Application {
 
@@ -36,18 +36,28 @@ public class CadastroLivro extends Application {
         gridPane.add(lblTitulo, 0, 0);
         gridPane.add(txtTitulo, 1, 0);
 
+        Label lblId = new Label("ID:");
+        TextField txtId = new TextField();
+        gridPane.add(lblId, 0, 1);
+        gridPane.add(txtId, 1, 1);
+
         Button btnCadastrar = new Button("Cadastrar");
         Button btnVoltarInicio = new Button("Voltar ao Início");
 
         btnCadastrar.setOnAction(e -> {
             String titulo = txtTitulo.getText();
+            int id = Integer.parseInt(txtId.getText());
 
-            //Titulo t = new Titulo(prazo, titulo);
-            boolean cadastrou = cadastrarLivro(titulo);
-            if (cadastrou) {
-                exibirAlerta(Alert.AlertType.INFORMATION, "Sucesso", "Livro cadastrado com sucesso!");
+            if (LivroDAO.verificarIdExistente(id)) {
+                exibirAlerta(Alert.AlertType.ERROR, "Erro", "ID já existente.");
             } else {
-                exibirAlerta(Alert.AlertType.ERROR, "Erro", "Ocorreu um erro ao cadastrar o livro.");
+                // Se o ID não existir, continuar com a inserção
+                boolean cadastrou = cadastrarLivro(titulo, id);
+                if (cadastrou) {
+                    exibirAlerta(Alert.AlertType.INFORMATION, "Sucesso", "Livro cadastrado com sucesso!");
+                } else {
+                    exibirAlerta(Alert.AlertType.ERROR, "Erro", "Ocorreu um erro ao cadastrar o livro.");
+                }
             }
         });
 
@@ -65,12 +75,13 @@ public class CadastroLivro extends Application {
         launch(args);
     }
 
-    private static boolean cadastrarLivro(String titulo) {
-        String sql = "INSERT INTO livros (titulo) VALUES (?)";
+    private static boolean cadastrarLivro(String titulo, int id) {
+        String sql = "INSERT INTO livros (titulo, id) VALUES (?, ?)";
     
         try (Connection conn = ConexaoBD.obterConexao();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, titulo);
+            stmt.setInt(2, id);
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {

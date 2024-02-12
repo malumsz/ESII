@@ -75,5 +75,21 @@ public class LivroDAO {
         
         return dataDevolucao;
     }
+
+    public static boolean verificarIdExistente(int id) {
+        String sql = "SELECT COUNT(*) FROM livros WHERE id = ?";
+        try (Connection conn = ConexaoBD.obterConexao();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                int count = resultSet.getInt(1);
+                return count > 0;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
     
 }

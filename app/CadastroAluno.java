@@ -23,6 +23,8 @@ import java.util.List;
 
 import bd.ConexaoBD;
 import classes.Aluno;
+import dao.AlunoDAO;
+import dao.LivroDAO;
 
 public class CadastroAluno extends Application {
 
@@ -51,12 +53,18 @@ public class CadastroAluno extends Application {
         btnCadastrar.setOnAction(e -> {
             String nome = txtNome.getText();
             String ra = txtRA.getText();
-            Aluno aluno = new Aluno(ra, nome);
-            boolean cadastrou = cadastrarAluno(nome, ra);
-            if (cadastrou) {
-                exibirAlerta(Alert.AlertType.INFORMATION, "Sucesso", "Aluno cadastrado com sucesso!");
+            //Aluno aluno = new Aluno(ra, nome);
+
+            if (AlunoDAO.verificarAlunoCadastrado(ra)) {
+                exibirAlerta(Alert.AlertType.ERROR, "Erro", "RA já existente.");
             } else {
-                exibirAlerta(Alert.AlertType.ERROR, "Erro", "Ocorreu um erro ao cadastrar o aluno.");
+                // Se o ID não existir, continuar com a inserção
+                boolean cadastrou = cadastrarAluno(nome, ra);
+                if (cadastrou) {
+                    exibirAlerta(Alert.AlertType.INFORMATION, "Sucesso", "Aluno cadastrado com sucesso!");
+                } else {
+                    exibirAlerta(Alert.AlertType.ERROR, "Erro", "Ocorreu um erro ao cadastrar o aluno.");
+                }
             }
         });
 
