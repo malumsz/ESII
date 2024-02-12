@@ -69,8 +69,8 @@ public class EmprestimoLivro extends Application {
     }
 
     private void emprestarLivros(String ra, String codigos, Date date) {
-        boolean alunoCadastrado = verificarAlunoCadastrado(ra);
-        boolean debitosAluno = verificarDebitosAluno(ra);
+        boolean alunoCadastrado = AlunoDAO.verificarAlunoCadastrado(ra);
+        boolean debitosAluno = AlunoDAO.verificarDebitosAluno(ra);
         boolean emprestimoEfetuado = false;
 
         if (alunoCadastrado && !debitosAluno) {
@@ -98,39 +98,6 @@ public class EmprestimoLivro extends Application {
         } else {
             exibirMensagem("Erro ao efetuar o empréstimo. Verifique os dados informados.");
         }
-    }
-
-    private boolean verificarAlunoCadastrado(String ra) {
-        String sql = "SELECT COUNT(*) FROM alunos WHERE ra = ?";
-        try (Connection conn = ConexaoBD.obterConexao();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, ra);
-            ResultSet resultSet = stmt.executeQuery();
-            if (resultSet.next()) {
-                int count = resultSet.getInt(1);
-                return count > 0;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-
-    }
-
-    public static boolean verificarDebitosAluno(String ra) {
-        String sql = "SELECT debito FROM alunos WHERE ra = ?";
-        try (Connection conn = ConexaoBD.obterConexao();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, ra);
-            ResultSet resultSet = stmt.executeQuery();
-            if (resultSet.next()) {
-                boolean debito = resultSet.getBoolean("debito");
-                return debito;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
     }
 
     public static boolean emprestarLivro(int codigoLivro, String ra, Date date) {

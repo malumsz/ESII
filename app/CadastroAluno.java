@@ -84,20 +84,13 @@ public class CadastroAluno extends Application {
     }
 
     private static boolean cadastrarAluno(String nome, String ra) {
-        String sql = "INSERT INTO alunos (nome, ra, debito) VALUES (?, ?, ?)";
-
-        try (Connection conn = ConexaoBD.obterConexao();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, nome);
-            stmt.setString(2, ra);
-            stmt.setBoolean(3, false);
-            stmt.executeUpdate();
+        if (AlunoDAO.inserirAluno(ra, nome)) {
             return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } else {
             return false;
         }
     }
+    
 
     private static void exibirAlerta(Alert.AlertType tipo, String titulo, String mensagem) {
         Alert alerta = new Alert(tipo);

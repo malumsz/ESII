@@ -52,7 +52,7 @@ public class CadastroLivro extends Application {
                 exibirAlerta(Alert.AlertType.ERROR, "Erro", "ID já existente.");
             } else {
                 // Se o ID não existir, continuar com a inserção
-                boolean cadastrou = cadastrarLivro(titulo, id);
+                boolean cadastrou = LivroDAO.cadastrarLivro(titulo, id);
                 if (cadastrou) {
                     exibirAlerta(Alert.AlertType.INFORMATION, "Sucesso", "Livro cadastrado com sucesso!");
                 } else {
@@ -73,23 +73,7 @@ public class CadastroLivro extends Application {
     }
     public static void main(String[] args) {
         launch(args);
-    }
-
-    private static boolean cadastrarLivro(String titulo, int id) {
-        String sql = "INSERT INTO livros (titulo, id, disponivel) VALUES (?, ?, ?)";
-    
-        try (Connection conn = ConexaoBD.obterConexao();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, titulo);
-            stmt.setInt(2, id);
-            stmt.setBoolean(3, true);
-            stmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }    
+    }  
 
     private static void exibirAlerta(Alert.AlertType tipo, String titulo, String mensagem) {
         Alert alerta = new Alert(tipo);

@@ -11,6 +11,22 @@ import classes.*;
 
 public class LivroDAO {
 
+    public static boolean cadastrarLivro(String titulo, int id) {
+        String sql = "INSERT INTO livros (titulo, id, disponivel) VALUES (?, ?, ?)";
+    
+        try (Connection conn = ConexaoBD.obterConexao();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, titulo);
+            stmt.setInt(2, id);
+            stmt.setBoolean(3, true);
+            stmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }  
+
     public static void marcarLivroComoDisponivel(int codigoLivro) throws SQLException {
         String sql = "UPDATE livros SET disponivel = ?, prazo_emprestimo = NULL WHERE id = ?";
         try (Connection connection = ConexaoBD.obterConexao();
