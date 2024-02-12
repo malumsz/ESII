@@ -10,13 +10,14 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import bd.ConexaoBD;
 import classes.*;
-import dao.LivroDAO;
+import dao.*;
 
 public class DevolverLivro extends Application {
 
@@ -65,6 +66,16 @@ public class DevolverLivro extends Application {
                 ResultSet resultSet = stmtVerificarEmprestimo.executeQuery();
                 
                 if (resultSet.next()) {
+                    // Obtém a data prevista de devolução do livro
+                    Date dataPrevistaDevolucao = resultSet.getDate("data_prevista_devolucao");
+                    // Obtém a data atual
+                    Date dataAtual = new Date(System.currentTimeMillis());
+
+                    // Verifica se a data de devolução ocorreu após a data prevista de devolução
+                    if (dataAtual.after(dataPrevistaDevolucao)) {
+                        AlunoDAO.criarDebito(raAluno);
+                    }
+
                     String sqlDevolverLivro = "UPDATE emprestimo SET data_devolucao = CURRENT_TIMESTAMP WHERE ra_aluno = ? AND codigo_livro = ?";
                     LivroDAO.marcarLivroComoDisponivel(codigoLivro); // Marcar livro como disponível novamente
                     
