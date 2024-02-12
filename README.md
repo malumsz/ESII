@@ -17,6 +17,6 @@
 
 ## Documentação 📄
 
-- [PDF](PDF)
+- [PDF.pdf](PDF)
 
 #
