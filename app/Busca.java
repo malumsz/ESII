@@ -32,7 +32,7 @@ public class Busca extends Application {
 
         // Criando uma caixa de seleção para escolher o tipo de busca
         ComboBox<String> comboBox = new ComboBox<>();
-        comboBox.getItems().addAll("Aluno", "Livro", "Empréstimo");
+        comboBox.getItems().addAll("Aluno", "Livro");
         comboBox.setValue("Aluno");
 
         // Criando campos de texto para entrada de dados
@@ -87,8 +87,6 @@ public class Busca extends Application {
                 return buscarAluno(termoBusca);
             case "Livro":
                 return buscarLivro(termoBusca);
-            case "Empréstimo":
-
             default:
                 return "Tipo de busca não suportado.";
         }
@@ -162,15 +160,26 @@ public class Busca extends Application {
     private String buscarLivro(String termoBusca) {
         StringBuilder resultado = new StringBuilder();
         try (Connection connection = ConexaoBD.obterConexao();
-            Statement statement = connection.createStatement()) {
-            String sql = "SELECT id, titulo, disponivel, prazo_emprestimo FROM livros WHERE titulo LIKE '%" + termoBusca + "%'";
-            ResultSet resultSet = statement.executeQuery(sql);
+            PreparedStatement statement = connection.prepareStatement("SELECT id, titulo, disponivel, prazo_emprestimo FROM livros WHERE titulo LIKE ? OR id = ?")) {
+            statement.setString(1, "%" + termoBusca + "%");
+            // Verificar se o termo de busca é um número válido
+            int id = 0;
+            try {
+                id = Integer.parseInt(termoBusca);
+            } catch (NumberFormatException ex) {
+                // Ignorar se o termo de busca não for um número válido
+            }
+            statement.setInt(2, id);
+
+            ResultSet resultSet = statement.executeQuery();
+            boolean livroEncontrado = false;
             while (resultSet.next()) {
-                int id = resultSet.getInt("id");
+                int idLivro = resultSet.getInt("id");
                 String titulo = resultSet.getString("titulo");
                 boolean disponibilidade = resultSet.getBoolean("disponivel");
                 Date prazoEmprestimo = resultSet.getDate("prazo_emprestimo");
-                resultado.append("ID: ").append(id).append("\n")
+
+                resultado.append("ID: ").append(idLivro).append("\n")
                         .append("Título: ").append(titulo).append("\n")
                         .append("Disponibilidade: ").append(disponibilidade ? "Sim" : "Não");
                 if (!disponibilidade) {
@@ -182,13 +191,16 @@ public class Busca extends Application {
                     }
                 }
                 resultado.append("\n\n");
+                livroEncontrado = true;
+            }
+            if (!livroEncontrado) {
+                resultado.append("Livro não encontrado.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return resultado.toString();
     }
-
 
     public static void main(String[] args) {
         launch(args);

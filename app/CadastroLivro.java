@@ -76,12 +76,13 @@ public class CadastroLivro extends Application {
     }
 
     private static boolean cadastrarLivro(String titulo, int id) {
-        String sql = "INSERT INTO livros (titulo, id) VALUES (?, ?)";
+        String sql = "INSERT INTO livros (titulo, id, disponivel) VALUES (?, ?, ?)";
     
         try (Connection conn = ConexaoBD.obterConexao();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, titulo);
             stmt.setInt(2, id);
+            stmt.setBoolean(3, true);
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {

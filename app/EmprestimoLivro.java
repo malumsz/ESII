@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 
 import bd.ConexaoBD;
+import dao.*;
 
 public class EmprestimoLivro extends Application {
 
@@ -159,9 +160,10 @@ public class EmprestimoLivro extends Application {
             inserirEmprestimoStatement.executeUpdate();
 
             // Atualizar status do livro para indisponível
-            String atualizarStatusQuery = "UPDATE livros SET disponivel = false WHERE id = ?";
+            String atualizarStatusQuery = "UPDATE livros SET disponivel = false, prazo_emprestimo = ? WHERE id = ?";
             PreparedStatement atualizarStatusStatement = conn.prepareStatement(atualizarStatusQuery);
-            atualizarStatusStatement.setInt(1, codigoLivro);
+            atualizarStatusStatement.setDate(1, date);
+            atualizarStatusStatement.setInt(2, codigoLivro);
             atualizarStatusStatement.executeUpdate();
 
             return true; // Empréstimo efetuado com sucesso
