@@ -84,12 +84,13 @@ public class CadastroAluno extends Application {
     }
 
     private static boolean cadastrarAluno(String nome, String ra) {
-        String sql = "INSERT INTO alunos (nome, ra) VALUES (?, ?)";
+        String sql = "INSERT INTO alunos (nome, ra, debito) VALUES (?, ?, ?)";
 
         try (Connection conn = ConexaoBD.obterConexao();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, nome);
             stmt.setString(2, ra);
+            stmt.setBoolean(3, false);
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
