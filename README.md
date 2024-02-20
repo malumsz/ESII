@@ -12,6 +12,7 @@ Aplicativo em ***java*** para um sistema de biblioteca na disciplina de *Engenha
 ## Requisitos ⚙️
 
 - `PostgreSQL JDBC Driver` para conexão com o banco de dados utilizando *PostgreSQL*;
+- biblioteca do `javafx`;
 - tabelas `.csv` com dados em `tables/`;
 - configuração da conexão com banco de dados no arquivo `bd/ConexaoBD.java`.
 
